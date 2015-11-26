@@ -41,7 +41,12 @@ public class Mine extends Button {
 							setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
 							gameStatus = false;
 						}else{
-							showMine(evaluateMine());
+							try{
+								showMine(evaluateMine());
+							}catch(ArrayIndexOutOfBoundsException ae){
+								
+							}
+							
 						
 						}
 					}
@@ -73,78 +78,55 @@ public class Mine extends Button {
 		return evaluated;
 	}
 	
-	public int evaluateMine(){      //call this if the mine has been clicked or if adjacent mine and this mine are blank. if bomb then out. if num then do nothing. if blank then peekAdjacentMines()
+	public int evaluateMine() throws ArrayIndexOutOfBoundsException{      //call this if the mine has been clicked or if adjacent mine and this mine are blank. if bomb then out. if num then do nothing. if blank then peekAdjacentMines()
 		evaluated = true;
 		setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
 		
 		int numAdjBombs = 0;
 		//adjacent bomb logic. should be 8
-		try{
 			if(field[rowIndex - 1][columIndex - 1].hasBomb) numAdjBombs++;//top three
-		}catch(ArrayIndexOutOfBoundsException e){}
-		try{
 			if(field[rowIndex - 1][columIndex    ].hasBomb) numAdjBombs++;
-		}catch(ArrayIndexOutOfBoundsException e){}
-		try{
 			if(field[rowIndex - 1][columIndex + 1].hasBomb) numAdjBombs++;
-		}catch(ArrayIndexOutOfBoundsException e){}
 		
-		try{
 			if(field[rowIndex    ][columIndex - 1].hasBomb) numAdjBombs++;//middle three
-		}catch(ArrayIndexOutOfBoundsException e){}
 			//middlebomb would be here
-		try{
 			if(field[rowIndex    ][columIndex + 1].hasBomb) numAdjBombs++;
-		}catch(ArrayIndexOutOfBoundsException e){}
 		
-		try{
 			if(field[rowIndex + 1][columIndex - 1].hasBomb) numAdjBombs++;//bottom three
-		}catch(ArrayIndexOutOfBoundsException e){}
-		try{
 			if(field[rowIndex + 1][columIndex    ].hasBomb) numAdjBombs++;
-		}catch(ArrayIndexOutOfBoundsException e){}
-		try{
 			if(field[rowIndex + 1][columIndex + 1].hasBomb) numAdjBombs++;
-		}catch(ArrayIndexOutOfBoundsException e){}
 		
 		return numAdjBombs;
 	}
 	
-	public void  peekAdjacentMines(){ //gets the value of the nearby uncovered mines. shows them if they are equal to 0
+	public void  peekAdjacentMines() throws ArrayIndexOutOfBoundsException{ //gets the value of the nearby uncovered mines. shows them if they are equal to 0
 		//top
-		try{
+
 			if(field[this.rowIndex - 1][this.columIndex - 1].evaluateMine() == 0 && field[this.rowIndex - 1][this.columIndex - 1].isEvaluated() == false) field[this.rowIndex - 1][this.columIndex - 1].showMine(field[this.rowIndex - 1][this.columIndex - 1].evaluateMine());//top three
-		}catch(ArrayIndexOutOfBoundsException e){}
-		
-		try{
+
 			if(field[this.rowIndex - 1][this.columIndex    ].evaluateMine() == 0 && field[this.rowIndex - 1][this.columIndex    ].isEvaluated() == false) field[this.rowIndex - 1][this.columIndex    ].showMine(field[this.rowIndex - 1][this.columIndex    ].evaluateMine());
-		}catch(ArrayIndexOutOfBoundsException e){}
-		
-		try{	
+
 			if(field[this.rowIndex - 1][this.columIndex + 1].evaluateMine() == 0 && field[this.rowIndex - 1][this.columIndex + 1].isEvaluated() == false) field[this.rowIndex - 1][this.columIndex + 1].showMine(field[this.rowIndex - 1][this.columIndex + 1].evaluateMine());
-		}catch(ArrayIndexOutOfBoundsException e){}
+
 		
 		//middle
-		try{	
+
 			if(field[this.rowIndex    ][this.columIndex - 1].evaluateMine() == 0 && field[this.rowIndex    ][this.columIndex - 1].isEvaluated() == false) field[this.rowIndex    ][this.columIndex - 1].showMine(field[this.rowIndex    ][this.columIndex - 1].evaluateMine());//middle three
-		}catch(ArrayIndexOutOfBoundsException e){}	
+
 			//middlebomb would be here
-		try{	
+
 			if(field[this.rowIndex    ][this.columIndex + 1].evaluateMine() == 0 && field[this.rowIndex    ][this.columIndex + 1].isEvaluated() == false) field[this.rowIndex    ][this.columIndex + 1].showMine(field[this.rowIndex    ][this.columIndex + 1].evaluateMine());
-		}catch(ArrayIndexOutOfBoundsException e){}
 		
 		//bottom
-		try{	
+
 			if(field[this.rowIndex + 1][this.columIndex - 1].evaluateMine() == 0 && field[this.rowIndex + 1][this.columIndex - 1].isEvaluated() == false) field[this.rowIndex + 1][this.columIndex - 1].showMine(field[this.rowIndex + 1][this.columIndex - 1].evaluateMine());//bottom three
-		}catch(ArrayIndexOutOfBoundsException e){}
-		try{	
+
 			if(field[this.rowIndex + 1][this.columIndex    ].evaluateMine() == 0 && field[this.rowIndex + 1][this.columIndex    ].isEvaluated() == false) field[this.rowIndex + 1][this.columIndex    ].showMine(field[this.rowIndex + 1][this.columIndex    ].evaluateMine());
-		}catch(ArrayIndexOutOfBoundsException e){}	
-		try{	
+
 			if(field[this.rowIndex + 1][this.columIndex + 1].evaluateMine() == 0 && field[this.rowIndex + 1][this.columIndex + 1].isEvaluated() == false) field[this.rowIndex + 1][this.columIndex + 1].showMine(field[this.rowIndex + 1][this.columIndex + 1].evaluateMine());
-		}catch(ArrayIndexOutOfBoundsException e){
+
 			
-		}
+		
 	}
 	
 	public void showMine(int numAdjBombs){
