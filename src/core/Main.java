@@ -20,7 +20,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		
-		MineField minefield = new MineField(7, 2);
+		MineField minefield = new MineField(16, 16);
 		
 		/*
 		//booton tyme
@@ -54,9 +54,9 @@ public class Main extends Application {
 
 		//set stage properties
 		stage.show();
-		stage.setWidth(450);
-		stage.setHeight(350);
-		stage.setTitle("mer stagemenstien");
+		stage.setWidth(550);
+		stage.setHeight(460);
+		stage.setTitle("Minesweeper");
 		stage.centerOnScreen();
 		stage.setResizable(false);
 	}
