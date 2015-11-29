@@ -20,7 +20,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		
-		MineField minefield = new MineField(16, 16);
+		MineField minefield = new MineField(8, 8);
 		
 		/*
 		//booton tyme

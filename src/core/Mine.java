@@ -3,6 +3,7 @@ package core;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -20,6 +21,7 @@ public class Mine extends Button {
 	private boolean gameStatus = true;
 	private Mine[][] field;
 	private boolean evaluated = false;
+	private int numAdjBombs = 0;
 	
 	
 	public Mine(int rowIndex, int columIndex, Mine[][] field){
@@ -29,28 +31,41 @@ public class Mine extends Button {
 		this.columIndex = columIndex;
 		this.field = field;
 		
+		
 		this.setWidth(50);
 		this.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
 		this.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+		System.out.println(getBackground().getFills().get(0).getFill());
+		System.out.println("  s");
+		System.out.println(Color.GRAY);
+		System.out.println(getBackground().getFills().get(0).getFill().equals(Color.GRAY));
+		
 		
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, 
 				new EventHandler<MouseEvent>() {
-					public void handle(MouseEvent e){//if pressed do a thing
+					public void handle(MouseEvent e){//if left clicked evaluate
 						setCursor(Cursor.DEFAULT);
-						if(hasBomb){
-							setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
-							gameStatus = false;
-						}else{
-							try{
-								showMine(evaluateMine());
-							}catch(ArrayIndexOutOfBoundsException ae){
-								
-							}
-							
 						
+						if(e.getButton() == MouseButton.PRIMARY){
+						
+							if(hasBomb){
+								setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
+								gameStatus = false;
+							}else{
+									showMine(evaluateMine());
+							}
+						
+							if(e.getButton() == MouseButton.SECONDARY){
+								toggleFoundBomb();
+							}
 						}
+						if(e.getButton() == MouseButton.SECONDARY){
+							toggleFoundBomb();
+						}
+						
 					}
 		});
+		
 	}
 
 
@@ -77,64 +92,114 @@ public class Mine extends Button {
 	public boolean isEvaluated(){
 		return evaluated;
 	}
+
+	public void toggleFoundBomb(){
+		if(getBackground().getFills().get(0).getFill().equals(Color.GRAY)){
+			setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
+		}else if(getBackground().getFills().get(0).getFill().equals(Color.GREENYELLOW)){
+			setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
+		}
+	}
 	
-	public int evaluateMine() throws ArrayIndexOutOfBoundsException{      //call this if the mine has been clicked or if adjacent mine and this mine are blank. if bomb then out. if num then do nothing. if blank then peekAdjacentMines()
-		evaluated = true;
+	public int evaluateMine(){      //call this if the mine has been clicked or if adjacent mine is blank. if bomb then out. if num then do nothing. if blank then peekAdjacentMines()
+		
 		setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
+		numAdjBombs = 0;
 		
-		int numAdjBombs = 0;
-		//adjacent bomb logic. should be 8
+		//adjacent bomb logic
+//top		
+		try{
 			if(field[rowIndex - 1][columIndex - 1].hasBomb) numAdjBombs++;//top three
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
 			if(field[rowIndex - 1][columIndex    ].hasBomb) numAdjBombs++;
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
 			if(field[rowIndex - 1][columIndex + 1].hasBomb) numAdjBombs++;
-		
+		}catch(ArrayIndexOutOfBoundsException e){}
+//middle		
+		try{
 			if(field[rowIndex    ][columIndex - 1].hasBomb) numAdjBombs++;//middle three
-			//middlebomb would be here
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
 			if(field[rowIndex    ][columIndex + 1].hasBomb) numAdjBombs++;
-		
+		}catch(ArrayIndexOutOfBoundsException e){}
+//bottom		
+		try{
 			if(field[rowIndex + 1][columIndex - 1].hasBomb) numAdjBombs++;//bottom three
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
 			if(field[rowIndex + 1][columIndex    ].hasBomb) numAdjBombs++;
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
 			if(field[rowIndex + 1][columIndex + 1].hasBomb) numAdjBombs++;
+		}catch(ArrayIndexOutOfBoundsException e){}
+
 		
 		return numAdjBombs;
 	}
 	
-	public void  peekAdjacentMines() throws ArrayIndexOutOfBoundsException{ //gets the value of the nearby uncovered mines. shows them if they are equal to 0
-		//top
 
-			if(field[this.rowIndex - 1][this.columIndex - 1].evaluateMine() == 0 && field[this.rowIndex - 1][this.columIndex - 1].isEvaluated() == false) field[this.rowIndex - 1][this.columIndex - 1].showMine(field[this.rowIndex - 1][this.columIndex - 1].evaluateMine());//top three
-
-			if(field[this.rowIndex - 1][this.columIndex    ].evaluateMine() == 0 && field[this.rowIndex - 1][this.columIndex    ].isEvaluated() == false) field[this.rowIndex - 1][this.columIndex    ].showMine(field[this.rowIndex - 1][this.columIndex    ].evaluateMine());
-
-			if(field[this.rowIndex - 1][this.columIndex + 1].evaluateMine() == 0 && field[this.rowIndex - 1][this.columIndex + 1].isEvaluated() == false) field[this.rowIndex - 1][this.columIndex + 1].showMine(field[this.rowIndex - 1][this.columIndex + 1].evaluateMine());
-
+	public void  peekAdjacentMines(){ //gets the value of the nearby uncovered mines.
+//top
+		try{
+			if(field[this.rowIndex - 1][this.columIndex - 1].isEvaluated() == false){
+				field[this.rowIndex - 1][this.columIndex - 1].showMine(field[this.rowIndex - 1][this.columIndex - 1].evaluateMine());//top three
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
+			if(field[this.rowIndex - 1][this.columIndex    ].isEvaluated() == false){
+				field[this.rowIndex - 1][this.columIndex    ].showMine(field[this.rowIndex - 1][this.columIndex    ].evaluateMine());
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
+			if(field[this.rowIndex - 1][this.columIndex + 1].isEvaluated() == false){
+				field[this.rowIndex - 1][this.columIndex + 1].showMine(field[this.rowIndex - 1][this.columIndex + 1].evaluateMine());
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
+//middle		
+		try{
+			if(field[this.rowIndex    ][this.columIndex - 1].isEvaluated() == false){
+				field[this.rowIndex    ][this.columIndex - 1].showMine(field[this.rowIndex    ][this.columIndex - 1].evaluateMine());
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
+		//middlebomb would be here
+		try{
+			if(field[this.rowIndex    ][this.columIndex + 1].isEvaluated() == false){
+				field[this.rowIndex    ][this.columIndex + 1].showMine(field[this.rowIndex    ][this.columIndex + 1].evaluateMine());
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
 		
-		//middle
-
-			if(field[this.rowIndex    ][this.columIndex - 1].evaluateMine() == 0 && field[this.rowIndex    ][this.columIndex - 1].isEvaluated() == false) field[this.rowIndex    ][this.columIndex - 1].showMine(field[this.rowIndex    ][this.columIndex - 1].evaluateMine());//middle three
-
-			//middlebomb would be here
-
-			if(field[this.rowIndex    ][this.columIndex + 1].evaluateMine() == 0 && field[this.rowIndex    ][this.columIndex + 1].isEvaluated() == false) field[this.rowIndex    ][this.columIndex + 1].showMine(field[this.rowIndex    ][this.columIndex + 1].evaluateMine());
-		
-		//bottom
-
-			if(field[this.rowIndex + 1][this.columIndex - 1].evaluateMine() == 0 && field[this.rowIndex + 1][this.columIndex - 1].isEvaluated() == false) field[this.rowIndex + 1][this.columIndex - 1].showMine(field[this.rowIndex + 1][this.columIndex - 1].evaluateMine());//bottom three
-
-			if(field[this.rowIndex + 1][this.columIndex    ].evaluateMine() == 0 && field[this.rowIndex + 1][this.columIndex    ].isEvaluated() == false) field[this.rowIndex + 1][this.columIndex    ].showMine(field[this.rowIndex + 1][this.columIndex    ].evaluateMine());
-
-			if(field[this.rowIndex + 1][this.columIndex + 1].evaluateMine() == 0 && field[this.rowIndex + 1][this.columIndex + 1].isEvaluated() == false) field[this.rowIndex + 1][this.columIndex + 1].showMine(field[this.rowIndex + 1][this.columIndex + 1].evaluateMine());
-
+//bottom		
+		try{
+			if(field[this.rowIndex + 1][this.columIndex - 1].isEvaluated() == false){
+				field[this.rowIndex + 1][this.columIndex - 1].showMine(field[this.rowIndex + 1][this.columIndex - 1].evaluateMine());
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
+		try{
 			
+			if(field[this.rowIndex + 1][this.columIndex    ].isEvaluated() == false){
+				field[this.rowIndex + 1][this.columIndex    ].showMine(field[this.rowIndex + 1][this.columIndex    ].evaluateMine());
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
 		
+		try{
+		
+			if(field[this.rowIndex + 1][this.columIndex - 1].isEvaluated() == false){
+				field[this.rowIndex + 1][this.columIndex - 1].showMine(field[this.rowIndex + 1][this.columIndex - 1].evaluateMine());
+			}
+		}catch(ArrayIndexOutOfBoundsException e){}
 	}
+
 	
-	public void showMine(int numAdjBombs){
+	public void showMine(int numAdjBombs){//shows the user the value of the mine
 		if(numAdjBombs == 0){
 			setText("  ");
+			evaluated = true;
 			this.peekAdjacentMines();
 		}else{
 			setText("" + numAdjBombs);
+			evaluated = true;
 		}	
 	}
 
