@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -20,30 +22,13 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		
-		MineField minefield = new MineField(8, 8);
+		MineField minefield = new MineField(16, 16);
 		
-		/*
-		//booton tyme
-		Mine b1 = new Mine(0, 0);
-		//b1.setCursor(Cursor.HAND);
-		Mine b2 = new Mine(0, 0);
-		Mine b3 = new Mine(0, 0);
-		Mine b4 = new Mine(0, 0);
-		Mine b5 = new Mine(0, 0);
-		Mine b6 = new Mine(0, 0);
-		
-
-		GridPane gp = new GridPane();
-		gp.setVgap(0);
-		gp.setHgap(0);
-		
-		gp.add(b1, 0, 0);
-		gp.add(b2, 1, 0);
-		gp.add(b3, 0, 1);
-		gp.add(b4, 1, 1);
-		gp.add(b5, 0, 2);
-		gp.add(b6, 1, 2);
-		*/
+		Text txt = new Text("   Welcome to Minesweeper");
+		txt.setFont(new Font(20));
+		minefield.getGridPane().add(txt, 17, 2);
+		WinText.winTxt.setFont(new Font(20));
+		minefield.getGridPane().add(WinText.winTxt, 17, 12);
 		
 		
 		Scene sc = new Scene(minefield.getGridPane());
@@ -54,7 +39,7 @@ public class Main extends Application {
 
 		//set stage properties
 		stage.show();
-		stage.setWidth(550);
+		stage.setWidth(750);
 		stage.setHeight(460);
 		stage.setTitle("Minesweeper");
 		stage.centerOnScreen();

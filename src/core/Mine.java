@@ -13,16 +13,17 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 public class Mine extends Button {
 	private int rowIndex   = 0;
 	private int columIndex = 0;
 	private boolean hasBomb = false;
-	private boolean gameStatus = true;
 	private Mine[][] field;
 	private boolean evaluated = false;
 	private int numAdjBombs = 0;
-	
+	private static boolean gameStatus = true; //used to tell if a bomb has been clicked
+	private static int clickedMines = 0;//used to tell how close we are to winning
 	
 	public Mine(int rowIndex, int columIndex, Mine[][] field){
 		super("  ");//makes the button more square
@@ -35,22 +36,17 @@ public class Mine extends Button {
 		this.setWidth(50);
 		this.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
 		this.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-		System.out.println(getBackground().getFills().get(0).getFill());
-		System.out.println("  s");
-		System.out.println(Color.GRAY);
-		System.out.println(getBackground().getFills().get(0).getFill().equals(Color.GRAY));
-		
 		
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, 
-				new EventHandler<MouseEvent>() {
-					public void handle(MouseEvent e){//if left clicked evaluate
+				e -> {//if left clicked evaluate
 						setCursor(Cursor.DEFAULT);
 						
 						if(e.getButton() == MouseButton.PRIMARY){
-						
+							
 							if(hasBomb){
 								setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
-								gameStatus = false;
+								Mine.gameStatus = false;
+								WinText.winTxt.setText("	:(");
 							}else{
 									showMine(evaluateMine());
 							}
@@ -61,13 +57,9 @@ public class Mine extends Button {
 						}
 						if(e.getButton() == MouseButton.SECONDARY){
 							toggleFoundBomb();
-						}
-						
-					}
-		});
-		
+						}	
+				});
 	}
-
 
 	public int getRowIndex() {
 		return rowIndex;
@@ -85,13 +77,14 @@ public class Mine extends Button {
 		return hasBomb;
 	}
 	
-	public boolean getGameStatus(){
-		return gameStatus;
-	}
-	
 	public boolean isEvaluated(){
 		return evaluated;
 	}
+	
+	public static int getClickedBombs(){
+		return clickedMines;
+	}
+	
 
 	public void toggleFoundBomb(){
 		if(getBackground().getFills().get(0).getFill().equals(Color.GRAY)){
@@ -185,14 +178,15 @@ public class Mine extends Button {
 		
 		try{
 		
-			if(field[this.rowIndex + 1][this.columIndex - 1].isEvaluated() == false){
-				field[this.rowIndex + 1][this.columIndex - 1].showMine(field[this.rowIndex + 1][this.columIndex - 1].evaluateMine());
+			if(field[this.rowIndex + 1][this.columIndex + 1].isEvaluated() == false){
+				field[this.rowIndex + 1][this.columIndex + 1].showMine(field[this.rowIndex + 1][this.columIndex + 1].evaluateMine());
 			}
 		}catch(ArrayIndexOutOfBoundsException e){}
 	}
 
 	
 	public void showMine(int numAdjBombs){//shows the user the value of the mine
+		clickedMines++;
 		if(numAdjBombs == 0){
 			setText("  ");
 			evaluated = true;
@@ -200,6 +194,9 @@ public class Mine extends Button {
 		}else{
 			setText("" + numAdjBombs);
 			evaluated = true;
+			if(clickedMines == MineField.getNumMines() - MineField.getNumBombs()){
+				WinText.winTxt.setText("	:)");
+			}
 		}	
 	}
 
