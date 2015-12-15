@@ -16,6 +16,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 public class Mine extends Button {
+	
+	/*
+	 * This class:  - automatically sets up event handlers for each mine(because they are all the same)
+	 * 				- evaluates the number of adjacent bombs based on data passed in from the Minefield and shows that number
+	 * 				- activates win lose cases based on the outcome of the game
+	 */
+	
 	private int rowIndex   = 0;
 	private int columIndex = 0;
 	private boolean hasBomb = false;
@@ -23,7 +30,7 @@ public class Mine extends Button {
 	private boolean evaluated = false;
 	private int numAdjBombs = 0;
 	private static boolean gameStatus = true; //used to tell if a bomb has been clicked
-	private static int clickedMines = 0;//used to tell how close we are to winning
+	private static int clickedMines = 0;//used to tell when all mines without a bomb are pressed
 	
 	public Mine(int rowIndex, int columIndex, Mine[][] field){
 		super("  ");//makes the button more square
@@ -46,7 +53,8 @@ public class Mine extends Button {
 							if(hasBomb){
 								setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
 								Mine.gameStatus = false;
-								WinText.winTxt.setText("	:(");
+								GlobalData.winTxt.setText("	:(");
+								GlobalData.timeline.pause();
 							}else{
 									showMine(evaluateMine());
 							}
@@ -194,8 +202,9 @@ public class Mine extends Button {
 		}else{
 			setText("" + numAdjBombs);
 			evaluated = true;
-			if(clickedMines == MineField.getNumMines() - MineField.getNumBombs()){
-				WinText.winTxt.setText("	:)");
+			if(clickedMines == MineField.getNumMines() - MineField.getNumBombs() && gameStatus){//added the && gameStatus because otherwise on the last hit you could lose and then it would quickly change to a win
+				GlobalData.winTxt.setText("	:)");
+				GlobalData.timeline.pause();
 			}
 		}	
 	}
