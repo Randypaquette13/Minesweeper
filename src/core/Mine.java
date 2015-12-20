@@ -46,6 +46,7 @@ public class Mine extends Button {
 		
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, 
 				e -> {//if left clicked evaluate
+					if(gameStatus){
 						setCursor(Cursor.DEFAULT);
 						
 						if(e.getButton() == MouseButton.PRIMARY){
@@ -55,6 +56,7 @@ public class Mine extends Button {
 								Mine.gameStatus = false;
 								GlobalData.winTxt.setText("	:(");
 								GlobalData.timeline.pause();
+								showBombs();
 							}else{
 									showMine(evaluateMine());
 							}
@@ -66,6 +68,7 @@ public class Mine extends Button {
 						if(e.getButton() == MouseButton.SECONDARY){
 							toggleFoundBomb();
 						}	
+					}
 				});
 	}
 
@@ -93,6 +96,15 @@ public class Mine extends Button {
 		return clickedMines;
 	}
 	
+	public void showBombs(){
+		for(int i = 0; i <field.length; i++){
+			for(int j = 0; j < field.length; j++){
+				if(field[i][j].getHasBomb()){
+					field[i][j].setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
+				}
+			}
+		}
+	}
 
 	public void toggleFoundBomb(){
 		if(getBackground().getFills().get(0).getFill().equals(Color.GRAY)){
